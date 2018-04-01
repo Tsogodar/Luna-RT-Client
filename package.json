@@ -1,0 +1,19 @@
+{
+  "name": "client-io",
+  "version": "1.0.0",
+  "description": "Client side socket.io",
+  "main": "./app.js",
+  "preferGlobal": true,
+  "bin": "./app.js",
+  "scripts": {
+    "start": "nodemon ./Client/app.js"
+  },
+  "dependencies": {
+    "socket.io-client": "2.0.4",
+    "request": "2.85.0",
+    "commander": "2.15.0"
+  },
+  "keywords": [],
+  "author": "Marcin Gryczon",
+  "license": "MIT"
+}
