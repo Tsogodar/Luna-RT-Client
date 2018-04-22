@@ -1,30 +1,56 @@
 #!/usr/bin/env node
 
-const socketClient=require('socket.io-client');
-const request=require('request');
+const socketIO = require('socket.io-client');
 const commander = require('commander');
+const inquirer=require('inquirer');
+
 
 const url = 'http://localhost:3000';
 
-const conn=socketClient(url);
+const newConnect = () => {
+    const conn = socketIO(url);
+    conn.emit('userConnect');
+    conn.on('userConnectStatus', (status) => {
+       console.log('Połączono z serwerem')
+        // inquirer.prompt([{type:'input',message:'>',name:'userInput',prefix:' ',validate: function(value) {
+        //     switch (value){
+        //         case 'exit':
+        //             process.exit(0);
+        //             break;
+        //         case 'message':
+        //             console.log('send message');
+        //             break;
+        //         default:
+        //             return 'Dostępne polecenia to: `exit`, `message`'
+        //     }}}]).then(answers => {
+        // });
+    });
 
-const newConnect=()=>{
-    request(url,(err,res,body)=>{
-        let requestTime=new Date().getTime();
-        console.info(`Próba połączenia z serwerem...`);
-        conn.on('connectOk', () => {
-            let responseTime = new Date().getTime();
-            console.info(`Serwer stworzył połączenie...`)
-            console.info(`Czas uzyskania połączenia: ${responseTime - requestTime} milisekund`)
-        })
-    })
-}
+    conn.on('userDisconnectForceStatus', (logout) => {
+        console.log(logout.info);
+        process.exit(0)
+    });
+
+    conn.on('serverShutdownStatus', () => {
+        console.log('Rozłączono: serwer wyłączony');
+        process.exit(0);
+    });
+
+    conn.on('serverRestartStatus', () => {
+        console.log('Rozłączono: serwer zrestartowany');
+        process.exit(0);
+    });
+    conn.on('userNewMessage', (message) => {
+        console.log(`Wiadomość od administratora: ${message.info}`);
+        conn.emit('messageDelivered');
+    });
+};
 
 commander
-    .version('0.1.0')
-    
+    .version('0.1.0');
+
 commander
-    .command('nweConnect')
+    .command('newConnect')
     .alias('connect')
     .action(() => {
         newConnect();
